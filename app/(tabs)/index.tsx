@@ -1,18 +1,50 @@
 import { Image } from "expo-image";
-import { router } from "expo-router";
-import { useEffect, useState } from "react";
-import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
+import {
+  DeviceEventEmitter,
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { getAllRecipes } from "../database/api";
-import { Recipe } from "../database/db";
+import { getAllRecipes } from "../../database/api";
+import { Recipe } from "../../database/db";
 
 export default function Index() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
 
-  useEffect(() => {
-    const recipesData = getAllRecipes();
-    setRecipes(recipesData);
+  // To be invoked with page focus and emitter subscription.
+  const loadData = useCallback(() => {
+    const data = getAllRecipes();
+    setRecipes([...data]);
   }, []);
+
+  // Rehydrates page on focus. No old values.
+  // Maybe unnecessary, but lets keep for now.
+  useFocusEffect(
+    useCallback(() => {
+      loadData();
+    }, [loadData])
+  );
+
+  // A sibling modal changes data. Page needs rehydrate with change.
+  // "DeviceEventEmitter" is react native way for it.
+  useEffect(() => {
+    const subscription = DeviceEventEmitter.addListener(
+      "event.updateRecipes",
+      () => {
+        loadData();
+      }
+    );
+
+    // Remove subscription with component unmount.
+    return () => {
+      subscription.remove();
+    };
+  }, [loadData]);
 
   return (
     <SafeAreaView
@@ -26,6 +58,7 @@ export default function Index() {
       <Text style={styles.headerTop}>Getting Hungry? Nice...</Text>
       <Text style={styles.header2}>Here Are Some Options:</Text>
       <View style={styles.listContainer}>
+        {/* Nice scrollable listing */}
         <FlatList
           showsHorizontalScrollIndicator={false}
           data={recipes}
@@ -40,11 +73,14 @@ export default function Index() {
                 });
               }}
             >
-              <Image
-                source={item.imageUrl}
-                style={styles.imageStyles}
-                contentFit="cover"
-              />
+              {/* "!!" necessary, else creates no text in view error */}
+              {!!item.imageUrl && (
+                <Image
+                  source={item.imageUrl}
+                  style={styles.imageStyles}
+                  contentFit="cover"
+                />
+              )}
               <Text style={styles.recipeTitle}>{item.title}</Text>
               <Text style={styles.recipeDescription}>{item.description}</Text>
             </Pressable>
