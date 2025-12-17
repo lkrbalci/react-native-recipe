@@ -7,7 +7,12 @@ import { Image } from "expo-image";
 import { Stack, useFocusEffect, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { getRecipeById, getRecipeCount } from "../../database/api";
+import {
+  getAllRecipes,
+  getRandomRecipe,
+  getRecipeById,
+  getRecipeCount,
+} from "../../database/api";
 import { Recipe } from "../../database/db";
 
 type Props = {};
@@ -21,6 +26,7 @@ const recipe = (props: Props) => {
   useEffect(() => {
     if (id) {
       setRecipeId(id);
+    } else {
     }
   }, [id]);
 
@@ -30,17 +36,23 @@ const recipe = (props: Props) => {
       if (recipeId) {
         const data = getRecipeById(recipeId);
         setRecipe(data);
+      } else {
+        setRecipe(getRandomRecipe);
       }
     }, [recipeId]) // Only listen to recipeId now
   );
 
   const handleDicePress = () => {
     const recipeCount = getRecipeCount();
-    let newId = Math.floor(Math.random() * recipeCount).toString();
-    while (newId === recipeId) {
-      newId = Math.floor(Math.random() * recipeCount).toString();
+    const recipes = getAllRecipes();
+    // -1 is a dirty way to avoid overflows. Ok for demo app I guess.
+    let index = Math.floor(Math.random() * (recipeCount - 1));
+    let recipe = recipes[index];
+    if (recipe.id === recipeId) {
+      index += 1;
+      recipe = recipes[index];
     }
-    setRecipeId(newId);
+    setRecipe(recipe);
   };
 
   return (

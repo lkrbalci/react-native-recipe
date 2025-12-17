@@ -8,17 +8,29 @@ const about = (props: Props) => {
     <View
       style={{
         flex: 1,
+        backgroundColor: "#0F172A",
         justifyContent: "center",
         alignItems: "center",
-        paddingLeft: 16,
-        paddingRight: 16,
+        padding: 16,
       }}
     >
-      <Text>about</Text>
+      <Text style={styles.headerTop}>About</Text>
+      <Text style={styles.description}>Just an App with Demo Purposes.</Text>
     </View>
   );
 };
 
 export default about;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  headerTop: {
+    fontSize: 48,
+    fontWeight: "bold",
+    marginBottom: 16,
+    color: "#F8FAFC",
+  },
+  description: {
+    fontSize: 16,
+    color: "#CBD5E1",
+  },
+});

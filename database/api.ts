@@ -23,3 +23,8 @@ export function addRecipe(newRecipe: Recipe) {
   const recipes = getRecipes();
   setRecipes([...recipes, newRecipe]);
 }
+
+export function getRecipeByIndex(index: number) {
+  const recipes = getRecipes();
+  return recipes[index];
+}
