@@ -86,14 +86,16 @@ const recipe = (props: Props) => {
               />
             </View>
           )}
-          <View style={styles.ingredientsContainer}>
-            {recipe?.ingredients.map((ingredient) => (
-              <Text
-                style={styles.ingredientText}
-                key={ingredient}
-              >{`\u2022 ${ingredient.trim()}`}</Text>
-            ))}
-          </View>
+          {!!recipe?.ingredients[0] && (
+            <View style={styles.ingredientsContainer}>
+              {recipe?.ingredients.map((ingredient) => (
+                <Text
+                  style={styles.ingredientText}
+                  key={ingredient}
+                >{`\u2022 ${ingredient.trim()}`}</Text>
+              ))}
+            </View>
+          )}
           <Text style={styles.preparationText}>{recipe?.preparation}</Text>
         </View>
       </ScrollView>
